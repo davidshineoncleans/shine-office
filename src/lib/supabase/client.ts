@@ -9,43 +9,6 @@ export const createClient = () => {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storage: {
-          getItem: (key) => {
-            if (typeof window === 'undefined' || typeof document === 'undefined') {
-              return null;
-            }
-            try {
-              const cookies = document.cookie.split(';');
-              const cookie = cookies.find((c) => c.trim().startsWith(`${key}=`));
-              return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
-            } catch (error) {
-              console.warn(`Failed to get cookie ${key}:`, error);
-              return null;
-            }
-          },
-          setItem: (key, value) => {
-            if (typeof window === 'undefined') {
-              return;
-            }
-            try {
-              document.cookie = `${key}=${encodeURIComponent(
-                value,
-              )}; path=/; secure; samesite=lax; max-age=2592000`;
-            } catch (error) {
-              console.warn(`Failed to set cookie ${key}:`, error);
-            }
-          },
-          removeItem: (key) => {
-            if (typeof window === 'undefined') {
-              return;
-            }
-            try {
-              document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=lax`;
-            } catch (error) {
-              console.warn(`Failed to remove cookie ${key}:`, error);
-            }
-          },
-        },
       },
       realtime: {
         worker: true,
@@ -60,7 +23,7 @@ export const createClient = () => {
       },
       global: {
         headers: {
-          'X-Client-Info': 'pager-frontend',
+          'X-Client-Info': 'shine-office',
         },
       },
     },
@@ -68,7 +31,7 @@ export const createClient = () => {
 };
 
 // Lazy singleton — avoids crashing during Next.js static prerendering
-// when env vars aren't available at module-evaluation time.
+// when env vars aren’t available at module-evaluation time.
 let _supabase: ReturnType<typeof createClient> | null = null;
 
 export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
@@ -79,3 +42,4 @@ export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
     return (_supabase as any)[prop];
   },
 });
+
